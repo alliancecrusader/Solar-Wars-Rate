@@ -10,7 +10,7 @@ npm run build
 cd dist
 
 git init
-git checkout -b gh-pages
+git checkout -b main
 git add -A
 git commit -m 'deploy'
 
