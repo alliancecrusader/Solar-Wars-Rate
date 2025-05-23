@@ -6,11 +6,31 @@ export type vehicle_cost = {
     cs_upkeep: number
 }
 
-export type param_type = {
-    id: string;
-    label: string;
-    type: "number" | "select" | "text";
-    step?: number;
-    options?: string[];
-    default?: number | string;
+type ParamBase = {
+  id: string;
+  label: string;
 };
+
+type ParamNumber = ParamBase & {
+  type: "number";
+  step?: number;
+  default?: number;
+};
+
+type ParamSelect = ParamBase & {
+  type: "select";
+  options: string[];
+  default?: string;
+};
+
+type ParamText = ParamBase & {
+  type: "text";
+  default?: string;
+};
+
+type ParamBool = ParamBase & {
+  type: "bool";
+  default?: boolean;
+};
+
+export type param_type = ParamNumber | ParamSelect | ParamText | ParamBool;

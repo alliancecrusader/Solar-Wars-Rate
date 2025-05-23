@@ -14,7 +14,7 @@ const cost_message_formatter = (cost: Types.vehicle_cost): string => {
 
 const DynamicCostCalculator: React.FC<CalculatorProps> = ({ rate_name, params, computeCost, goBack }) => {
   const [values, setValues] = useState<Record<string, any>>(
-    Object.fromEntries(params.map((param) => [param.id, param.default || ""]))
+    Object.fromEntries(params.map((param) => [param.id, param.default]))
   );
   const [result, setResult] = useState<Types.vehicle_cost | null>(null);
 
@@ -25,6 +25,14 @@ const DynamicCostCalculator: React.FC<CalculatorProps> = ({ rate_name, params, c
   const handleSubmit = () => {
     setResult(computeCost(values));
   };
+
+  const parseBool = (value: string): boolean => {
+    if (value.toLowerCase() === "true") return true;
+    if (value.toLowerCase() === "false") return false;
+    return false;
+  };
+
+  console.log("Current values:", values);
 
   return (
     <div className="container">
@@ -39,6 +47,15 @@ const DynamicCostCalculator: React.FC<CalculatorProps> = ({ rate_name, params, c
               value={values[param.id]}
               onChange={(e) => handleChange(param.id, parseFloat(e.target.value) || 0)}
             />
+          ) : param.type === "bool" ? (
+            <select
+              id={param.id}
+              value={values[param.id]}
+              onChange={(e) => handleChange(param.id, parseBool(e.target.value))}
+            >
+              <option value="true">True</option>
+              <option value="false">False</option>
+            </select>
           ) : param.type === "text" ? (
             <input
               type="text"

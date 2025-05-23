@@ -24,7 +24,6 @@
     transition: color 0.3s, background-color 0.3s;
   }
 
-  /* Theme definitions moved higher for better cascade */
   .light-mode {
     --text-color: rgba(0, 0, 0, 0.87);
     --bg-color: #ffffff;

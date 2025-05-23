@@ -43,15 +43,15 @@ const params: param_type[] = [
     {id: "lances", label: "Lance-like Weapon Count", type: "number", default: 0},
     {id: "pdc", label: "PDC-like Weapon Count", type: "number", default: 0},
     {id: "torpedoes", label: "Torpedo/Missile Count", type: "number", default: 0},
-    {id: "shield", label: "Has a Shield", type: "select", options: ["true", "false"], default: "false"},
-    {id: "stealth", label: "Has Stealth", type: "select", options: ["true", "false"], default: "false"},
+    {id: "shield", label: "Has a Shield", type: "bool", default: false},
+    {id: "stealth", label: "Has Stealth", type: "bool", default: false},
     {id: "systems", label: "Additional systems", type: "number", default: 0},
     {id: "engines", label: "Engines (format: '4S 2M 1L')", type: "text", default: "0"},
     {id: "ftl", label: "FTL Type", type: "select", options: ["EXT", "INT", "NONE"], default: "NONE"},
     {id: "cargo", label: "Cargo Space (1 unit per meter)", type: "number", default: 0},
-    {id: "drone", label: "Is a drone", type: "select", options: ["true", "false"], default: "false"},
+    {id: "drone", label: "Is a drone", type: "bool", default: false},
     {id: "other", label: "Other Costs", type: "number", default: 0},
-    {id: "boat", label: "Is a boat", type: "select", options: ["true", "false"], default: "false"}
+    {id: "boat", label: "Is a boat", type: "bool", default: false}
 ]
 
 const er = (values: shipRateInput): number => {
@@ -200,6 +200,8 @@ const rate = (values: shipRateInputPreprocessed): vehicle_cost => {
     const valuesCopy = { ...values };
     const processed: any = valuesCopy;
     processed.engines = splitCurrency(valuesCopy.engines ?? "0", "M");
+
+    console.log(values);
 
     return {
         er: Math.ceil(er(processed) * 1000000000 * multiplier),

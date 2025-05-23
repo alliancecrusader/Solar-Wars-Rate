@@ -1,4 +1,4 @@
-import { vehicle_cost, param_type } from '../modules/types';
+import { param_type } from '../modules/types';
 
 export type groundRateInput = {
     length: number,
@@ -20,7 +20,7 @@ const params: param_type[] = [
     {id: "medium", label: "Medium Weapons", type: "number", default: 0},
     {id: "light", label: "Light Weapons", type: "number", default: 0},
     {id: "rocket", label: "Rocket Weapons", type: "number", default: 0},
-    {id: "shield", label: "Shield", type: "select", options: ["true", "false"], default: "false"},
+    {id: "shield", label: "Shield", type: "bool", default: false},
     {id: "systems", label: "Systems", type: "number", default: 0}
 ]
 
@@ -45,49 +45,51 @@ const er = (values: groundRateInput) => {
         (heavy > 0) ? 7 :
         (medium > 0) ? 3 : 0;
 
-    const lengthCostER = length**2 / (armorCosts[armor].ER - weaponSystemCost);
+    const lengthCostER = length ** 2 / (armorCosts[armor].ER - weaponSystemCost);
 
-    const heavyCostER = heavy*0.9;
-    const mediumCostER = medium*0.3;
-    const lightCostER = light*0.03;
-    const rocketCostER = rocket*0.08;
+    const heavyCostER = heavy * 0.9;
+    const mediumCostER = medium * 0.3;
+    const lightCostER = light * 0.03;
+    const rocketCostER = rocket * 0.08;
     const shieldCostER = shield ? 1 : 0;
 
-    const systemCostER = 1 + systems*0.1 + protectionCosts[protection].ER;
+    const systemCostER = 1 + systems * 0.1 + protectionCosts[protection].ER;
 
-    return Math.ceil(systemCostER*(lengthCostER + heavyCostER + mediumCostER + lightCostER + rocketCostER + shieldCostER)*100)/100;
+    return Math.ceil(systemCostER * (lengthCostER + heavyCostER + mediumCostER + lightCostER + rocketCostER + shieldCostER) * 100) / 100;
 }
 
 const cm = (values: groundRateInput) => {
     const {length, armor, protection, heavy, medium, light, rocket, shield, systems} = values;
 
-    const lengthCostCM = length**2 / 8.5 + armorCosts[armor].CM + protectionCosts[protection].CM;
+    const lengthCostCM = length ** 2 / 8.5 + armorCosts[armor].CM + protectionCosts[protection].CM;
     
-    const heavyCostCM = heavy*10;
-    const mediumCostCM = medium*2;
-    const lightCostCM = light*0.3;
+    const heavyCostCM = heavy * 10;
+    const mediumCostCM = medium * 2;
+    const lightCostCM = light * 0.3;
     const rocketCostCM = rocket;
 	const shieldCostCM = shield ? 5 : 0;
 
     const systemCostCM = systems + 1;
 
-    return Math.ceil(systemCostCM*(lengthCostCM + heavyCostCM + mediumCostCM + lightCostCM + rocketCostCM + shieldCostCM)*20)/100;
+    return Math.ceil(Math.ceil(systemCostCM * (lengthCostCM + heavyCostCM + mediumCostCM + lightCostCM + rocketCostCM + shieldCostCM) * 20) / 100);
 }
 
 const el = (values: groundRateInput) => {
     const {length, armor, protection, heavy, medium, light, rocket, shield, systems} = values;
 
-    const lengthCostEL = 3*(length**2 / 85 + armorCosts[armor].EL + protectionCosts[protection].EL);
+    const lengthCostEL = 3 * (length ** 2 / 85 + armorCosts[armor].EL + protectionCosts[protection].EL);
     
-    const heavyCostEL = heavy*6;
-    const mediumCostEL = medium*10;
-    const lightCostEL = light*0.2;
-    const rocketCostEL = rocket*0.2;
-
-    const systemCostEL = systems*1.5 + 1;
+    const heavyCostEL = heavy * 6;
+    const mediumCostEL = medium * 10;
+    const lightCostEL = light * 0.2;
+    const rocketCostEL = rocket * 0.2;
+    const systemCostEL = systems * 1.5 + 1;
 	
-	const finalEL = shield ? systemCostEL*(lengthCostEL + heavyCostEL + mediumCostEL + lightCostEL + rocketCostEL)*1.1 + 30 : systemCostEL*(lengthCostEL + heavyCostEL + mediumCostEL + lightCostEL + rocketCostEL)
-    return Math.ceil(finalEL*20)/100;
+	const finalEL = shield ? 
+        systemCostEL * (lengthCostEL + heavyCostEL + mediumCostEL + lightCostEL + rocketCostEL) * 1.1 + 30 
+        : systemCostEL * (lengthCostEL + heavyCostEL + mediumCostEL + lightCostEL + rocketCostEL)
+
+    return Math.ceil(Math.ceil(finalEL * 20) / 100);
 }
 
 const cs = (values: groundRateInput, costCM: number, costEL: number) => {
@@ -103,24 +105,26 @@ const cs = (values: groundRateInput, costCM: number, costEL: number) => {
         (CSCostID === 3 || armorCosts[armor].CS === 3) ? 30 :
         (CSCostID === 2 || armorCosts[armor].CS === 2) ? 15 : 10;
 
-    const systemCostCS = systems*2.5;
+    const systemCostCS = systems * 2.5;
 
-    return Math.ceil((lengthCostCS + systemCostCS + 0.1*(costCM + costEL))*20)/100;
+    return Math.ceil(Math.ceil((lengthCostCS + systemCostCS + 0.1 * (costCM + costEL)) * 20) / 100);
 }
 
-const rate = (values: groundRateInput): vehicle_cost => {
-    const costCM = cm(values);
-    const costEL = el(values);
-    const costCS = cs(values, costCM, costEL);
+const rate = (value: groundRateInput) => {
+    const er_cost = er(value);
+    const cm_cost = cm(value);
+    const el_cost = el(value);
+    const cs_cost = cs(value, cm_cost, el_cost);
+    const cs_upkeep = Math.ceil(cs_cost / 6);
 
     return {
-        er: Math.ceil(er(values)*1000000),
-        cm: Math.ceil(costCM),
-        cs: Math.ceil(costCS),
-        el: Math.ceil(costEL),
-        cs_upkeep: Math.ceil(costCS/6)
+        er: er_cost,
+        cm: cm_cost,
+        el: el_cost,
+        cs: cs_cost,
+        cs_upkeep: cs_upkeep
     }
-} 
+}
 
 export default {
     rate: rate,

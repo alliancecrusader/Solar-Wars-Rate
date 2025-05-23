@@ -20,9 +20,7 @@ const App = () => {
   const [currentRater, setCurrentRater] = useState(null);
   const [theme, setTheme] = useState('light-mode');
 
-  // Use effect to apply the theme to the document element
   useEffect(() => {
-    // Remove previous theme class and add the current one to document element
     document.documentElement.classList.remove('light-mode', 'dark-mode');
     document.documentElement.classList.add(theme);
   }, [theme]);
