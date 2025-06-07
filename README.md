@@ -1,3 +1,6 @@
+# What is Solar Wars Rate?
+Solar Wars Rate is a React TypeScript web application created to algorithmically calculate the costs of fictional military materiel, including spacecraft, naval vessels, and ground vehicles.
+
 # Usage
 1. Clone the repository.
 2. Open a terminal in the repository directory and run `npm run dev`.
