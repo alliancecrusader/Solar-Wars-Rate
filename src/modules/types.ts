@@ -1,9 +1,16 @@
-export type vehicle_cost = {
+export type VehicleCost = {
     cs: number,
     cm: number,
     el: number,
     er: number,
     cs_upkeep: number
+}
+
+export type SlashCommand = {
+  command: string,
+  args: {
+    [key: string]: string
+  }
 }
 
 type ParamBase = {
@@ -33,4 +40,4 @@ type ParamBool = ParamBase & {
   default?: boolean;
 };
 
-export type param_type = ParamNumber | ParamSelect | ParamText | ParamBool;
+export type ParamType = ParamNumber | ParamSelect | ParamText | ParamBool;

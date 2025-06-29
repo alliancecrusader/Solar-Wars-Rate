@@ -3,12 +3,12 @@ import * as Types from "../modules/types";
 
 type CalculatorProps = {
   rate_name: string;
-  params: Types.param_type[];
-  computeCost: (values: any) => Types.vehicle_cost;
+  params: Types.ParamType[];
+  computeCost: (values: any) => Types.VehicleCost;
   goBack?: () => void;
 };
 
-const cost_message_formatter = (cost: Types.vehicle_cost): string => {
+const cost_message_formatter = (cost: Types.VehicleCost): string => {
     return `${cost.er} ER, ${cost.cm} CM, ${cost.cs} CS, ${cost.el} EL, ${cost.cs_upkeep} CS Upkeep`;
 }
 
@@ -16,7 +16,7 @@ const DynamicCostCalculator: React.FC<CalculatorProps> = ({ rate_name, params, c
   const [values, setValues] = useState<Record<string, any>>(
     Object.fromEntries(params.map((param) => [param.id, param.default]))
   );
-  const [result, setResult] = useState<Types.vehicle_cost | null>(null);
+  const [result, setResult] = useState<Types.VehicleCost | null>(null);
 
   const handleChange = (id: string, value: any) => {
     setValues((prev) => ({ ...prev, [id]: value }));

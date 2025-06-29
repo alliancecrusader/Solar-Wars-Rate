@@ -1,4 +1,4 @@
-import { vehicle_cost, param_type } from '../modules/types';
+import { VehicleCost, ParamType } from '../modules/types';
 
 export type shipRateInput = {
     length: number,
@@ -36,7 +36,7 @@ export type shipRateInputPreprocessed = {
     boat: boolean
 }
 
-const params: param_type[] = [
+const params: ParamType[] = [
     {id: "length", label: "Length of the Ship", type: "number", default: 100},
     {id: "main", label: "Primary Weapon Count", type: "number", default: 0},
     {id: "secondary", label: "Secondary Weapon Count", type: "number", default: 0},
@@ -194,7 +194,7 @@ const splitCurrency = (input = "", def = "ER") => {
     }
 }
 
-const rate = (values: shipRateInputPreprocessed): vehicle_cost => {
+const rate = (values: shipRateInputPreprocessed): VehicleCost => {
     const multiplier = values.boat ? 0.85 : 1;
     
     const valuesCopy = { ...values };

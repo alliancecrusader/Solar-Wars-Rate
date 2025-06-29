@@ -1,4 +1,4 @@
-import { param_type } from '../modules/types';
+import { ParamType } from '../modules/types';
 
 export type groundRateInput = {
     length: number,
@@ -12,7 +12,7 @@ export type groundRateInput = {
     systems: number
 }
 
-const params: param_type[] = [
+const params: ParamType[] = [
     {id: "length", label: "Length", type: "number", default: 10},
     {id: "armor", label: "Armor", type: "select", options: ["none", "light", "medium", "heavy"], default: "none"},
     {id: "protection", label: "Protection", type: "select", options: ["none", "soft", "hard", "both"], default: "none"},
