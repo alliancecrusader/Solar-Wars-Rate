@@ -111,7 +111,7 @@ const cs = (values: groundRateInput, costCM: number, costEL: number) => {
 }
 
 const rate = (value: groundRateInput) => {
-    const er_cost = er(value);
+    const er_cost = er(value) * (10**6);
     const cm_cost = cm(value);
     const el_cost = el(value);
     const cs_cost = cs(value, cm_cost, el_cost);
