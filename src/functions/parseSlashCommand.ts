@@ -1,5 +1,5 @@
 import { SlashCommand } from "../modules/types";
 
-export function parseSlashCommand() {
+// export function parseSlashCommand() {
 
-}
+// }
