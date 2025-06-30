@@ -1,9 +1,26 @@
-import { ParamType } from '../modules/types';
+import { Params } from '../modules/types';
 
-export type groundRateInput = {
+const armorOptions = {
+    none: "None",
+    light: "Light",
+    medium: "Medium",
+    heavy: "Heavy"
+}
+
+const protectionOptions = {
+    none: "None",
+    soft: "Soft-kill",
+    hard: "Hard-kill APS",
+    both: "Soft-kill and Hard-kill APS"
+}
+
+type ArmorType = keyof typeof armorOptions
+type ProtectionType = keyof typeof protectionOptions
+
+export type GroundRateInput = {
     length: number,
-    armor: "none" | "light" | "medium" | "heavy",
-    protection: "none" | "soft" | "hard" | "both",
+    armor: ArmorType,
+    protection: ProtectionType,
     heavy: number,
     medium: number,
     light: number,
@@ -12,17 +29,17 @@ export type groundRateInput = {
     systems: number
 }
 
-const params: ParamType[] = [
-    {id: "length", label: "Length", type: "number", default: 10},
-    {id: "armor", label: "Armor", type: "select", options: ["none", "light", "medium", "heavy"], default: "none"},
-    {id: "protection", label: "Protection", type: "select", options: ["none", "soft", "hard", "both"], default: "none"},
-    {id: "heavy", label: "Heavy Weapons", type: "number", default: 0},
-    {id: "medium", label: "Medium Weapons", type: "number", default: 0},
-    {id: "light", label: "Light Weapons", type: "number", default: 0},
-    {id: "rocket", label: "Rocket Weapons", type: "number", default: 0},
-    {id: "shield", label: "Shield", type: "bool", default: false},
-    {id: "systems", label: "Systems", type: "number", default: 0}
-]
+const params: Params = {
+    length: {id: "length", label: "Length", type: "number", num_type: "ufloat", default: 10},
+    armor: {id: "armor", label: "Armor", type: "select", options: armorOptions, default: "none"},
+    protection: {id: "protection", label: "Protection", type: "select", options: protectionOptions, default: "none"},
+    heavy: {id: "heavy", label: "Heavy Weapons", type: "number", num_type: "uint", default: 0},
+    medium: {id: "medium", label: "Medium Weapons", type: "number", num_type: "uint", default: 0},
+    light: {id: "light", label: "Light Weapons", type: "number", num_type: "uint", default: 0},
+    rocket: {id: "rocket", label: "Rocket Weapons", type: "number", num_type: "uint", default: 0},
+    shield: {id: "shield", label: "Shield", type: "bool", default: false},
+    systems: {id: "systems", label: "Systems", type: "number", num_type: "uint", default: 0}
+}
 
 const armorCosts = { //Costs are seemingly inverted
     heavy: {ER: 24, CM: 90, EL: 30, CS: 40},
@@ -38,7 +55,7 @@ const protectionCosts = { //Not inverted
     none: {ER: 0, CM: 0, EL: 0}
 }
 
-const er = (values: groundRateInput) => {
+const er = (values: GroundRateInput) => {
     const {length, armor, protection, heavy, medium, light, rocket, systems, shield} = values;
 
     const weaponSystemCost = 
@@ -58,7 +75,7 @@ const er = (values: groundRateInput) => {
     return Math.ceil(systemCostER * (lengthCostER + heavyCostER + mediumCostER + lightCostER + rocketCostER + shieldCostER) * 100) / 100;
 }
 
-const cm = (values: groundRateInput) => {
+const cm = (values: GroundRateInput) => {
     const {length, armor, protection, heavy, medium, light, rocket, shield, systems} = values;
 
     const lengthCostCM = length ** 2 / 8.5 + armorCosts[armor].CM + protectionCosts[protection].CM;
@@ -74,7 +91,7 @@ const cm = (values: groundRateInput) => {
     return Math.ceil(Math.ceil(systemCostCM * (lengthCostCM + heavyCostCM + mediumCostCM + lightCostCM + rocketCostCM + shieldCostCM) * 20) / 100);
 }
 
-const el = (values: groundRateInput) => {
+const el = (values: GroundRateInput) => {
     const {length, armor, protection, heavy, medium, light, rocket, shield, systems} = values;
 
     const lengthCostEL = 3 * (length ** 2 / 85 + armorCosts[armor].EL + protectionCosts[protection].EL);
@@ -92,7 +109,7 @@ const el = (values: groundRateInput) => {
     return Math.ceil(Math.ceil(finalEL * 20) / 100);
 }
 
-const cs = (values: groundRateInput, costCM: number, costEL: number) => {
+const cs = (values: GroundRateInput, costCM: number, costEL: number) => {
     const {armor, heavy, medium, light, rocket, systems} = values;
     
     const CSCostID = 
@@ -110,7 +127,7 @@ const cs = (values: groundRateInput, costCM: number, costEL: number) => {
     return Math.ceil(Math.ceil((lengthCostCS + systemCostCS + 0.1 * (costCM + costEL)) * 20) / 100);
 }
 
-const rate = (value: groundRateInput) => {
+const rate = (value: GroundRateInput) => {
     const er_cost = er(value) * (10**6);
     const cm_cost = cm(value);
     const el_cost = el(value);

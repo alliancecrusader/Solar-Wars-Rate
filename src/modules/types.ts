@@ -6,38 +6,67 @@ export type VehicleCost = {
     cs_upkeep: number
 }
 
-export type SlashCommand = {
-  command: string,
-  args: {
-    [key: string]: string
-  }
+export type InfantryCost = {
+  time: number;
+  er: number;
 }
 
-type ParamBase = {
+export type SlashCommand = {
+  command: string;
+  args: {
+    [key: string]: string
+  };
+}
+
+export type ParamBase = {
   id: string;
   label: string;
 };
 
-type ParamNumber = ParamBase & {
+export type NumberType = "int" | "uint" | "float" | "ufloat"
+
+export type ParamNumber = ParamBase & {
   type: "number";
-  step?: number;
+  num_type: NumberType;
+  range?: {
+    max?: number;
+    min?: number;
+  }
+  step?: number,
   default?: number;
 };
 
-type ParamSelect = ParamBase & {
+export type ParamSelect = ParamBase & {
   type: "select";
-  options: string[];
+  options: {[key: string]: string};
   default?: string;
 };
 
-type ParamText = ParamBase & {
+export type ParamText = ParamBase & {
   type: "text";
   default?: string;
 };
 
-type ParamBool = ParamBase & {
+export type ParamBool = ParamBase & {
   type: "bool";
   default?: boolean;
 };
 
 export type ParamType = ParamNumber | ParamSelect | ParamText | ParamBool;
+
+export type Params = {
+  [key: string]: ParamType
+}
+
+export type ParamTypeDict = {
+  number: ParamNumber;
+  select: ParamSelect;
+  bool: ParamBool;
+  text: ParamText;
+};
+
+export type InputBuilder<T extends keyof ParamTypeDict> = {
+  handleChange: (id: string, value: any) => void;
+  values: Record<string, any>;
+  param: ParamTypeDict[T];
+};

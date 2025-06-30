@@ -3,15 +3,18 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 
 import Rater from './components/Rater';
-
-import groundRate from './Raters/ground';
-import shipRate from './Raters/ship';
+import { raters, RaterItem } from './Raters/raters';
 
 const MainMenu = ({ onSelectRater, toggleTheme }: any) => (
   <div className="menu-container">
     <h1>Main Menu</h1>
-    <button className="menu-button" onClick={() => onSelectRater('ground')}>Ground Rater</button>
-    <button className="menu-button" onClick={() => onSelectRater('ship')}>Ship Rater</button>
+    {
+      Object.entries(raters).map(([id, value]) => (
+        <button key={id} className="menu-button" onClick={() => onSelectRater(id)}>
+          {value.label}
+        </button>
+      ))
+    }
     <button className="theme-toggle-button" onClick={toggleTheme}>Toggle Dark/Light Mode</button>
   </div>
 );
@@ -39,13 +42,23 @@ const App = () => {
 
   return (
     <div className={theme}>
-      {currentRater === null ? (
-        <MainMenu onSelectRater={handleSelectRater} toggleTheme={toggleTheme} />
-      ) : currentRater === 'ground' ? (
-        <Rater rate_name="Ground Rate" params={groundRate.params} computeCost={groundRate.rate} goBack={handleGoBack} />
-      ) : (
-        <Rater rate_name="Ship Rate" params={shipRate.params} computeCost={shipRate.rate} goBack={handleGoBack} />
-      )}
+      {
+        currentRater === null ? <MainMenu onSelectRater={handleSelectRater} toggleTheme={toggleTheme} /> :
+        (
+          () => {
+            const rater = raters[currentRater] as RaterItem || undefined;
+
+            if (rater === undefined) {
+              setCurrentRater(null);
+              throw Error("Unknown current rater");
+            }
+
+            return (
+              <Rater rate_name={rater.label as string} params={rater.rater.params} computeCost={rater.rater.rate} goBack={handleGoBack}></Rater>
+            )
+          }
+        )()
+      }
     </div>
   );
 };

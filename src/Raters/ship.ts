@@ -1,6 +1,15 @@
-import { VehicleCost, ParamType } from '../modules/types';
+import { VehicleCost, Params } from '../modules/types';
+import splitCurrency from '../functions/split_currency';
 
-export type shipRateInput = {
+const ftl_types = {
+    EXT: "External FTL",
+    INT: "Internal FTL",
+    NONE: "None"
+}
+
+type FTLType = keyof typeof ftl_types
+
+export type ShipRateInput = {
     length: number,
     main: number,
     secondary: number,
@@ -11,50 +20,36 @@ export type shipRateInput = {
     stealth: boolean,
     systems: number,
     engines: [number, string][],
-    ftl: "EXT" | "INT" | "NONE",
+    ftl: FTLType,
     cargo: number,
     drone: boolean,
     other: number,
     boat: boolean
 }
 
-export type shipRateInputPreprocessed = {
-    length: number,
-    main: number,
-    secondary: number,
-    lances: number,
-    pdc: number,
-    torpedoes: number,
-    shield: boolean,
-    stealth: boolean,
-    systems: number,
+export type ShipRateInputPreprocessed = Omit<ShipRateInput, "engines"> & {
     engines: string,
-    ftl: "EXT" | "INT" | "NONE",
-    cargo: number,
-    drone: boolean,
-    other: number,
-    boat: boolean
 }
 
-const params: ParamType[] = [
-    {id: "length", label: "Length of the Ship", type: "number", default: 100},
-    {id: "main", label: "Primary Weapon Count", type: "number", default: 0},
-    {id: "secondary", label: "Secondary Weapon Count", type: "number", default: 0},
-    {id: "lances", label: "Lance-like Weapon Count", type: "number", default: 0},
-    {id: "pdc", label: "PDC-like Weapon Count", type: "number", default: 0},
-    {id: "torpedoes", label: "Torpedo/Missile Count", type: "number", default: 0},
-    {id: "shield", label: "Has a Shield", type: "bool", default: false},
-    {id: "stealth", label: "Has Stealth", type: "bool", default: false},
-    {id: "systems", label: "Additional systems", type: "number", default: 0},
-    {id: "engines", label: "Engines (format: '4S 2M 1L')", type: "text", default: "0"},
-    {id: "ftl", label: "FTL Type", type: "select", options: ["EXT", "INT", "NONE"], default: "NONE"},
-    {id: "cargo", label: "Cargo Space (1 unit per meter)", type: "number", default: 0},
-    {id: "drone", label: "Is a drone", type: "bool", default: false},
-    {id: "other", label: "Other Costs", type: "number", default: 0},
-    {id: "boat", label: "Is a boat", type: "bool", default: false}
-]
+const params: Params = {
+    length: {id: "length", label: "Length of the Ship", type: "number", num_type: "ufloat", default: 100},
+    main: {id: "main", label: "Primary Weapon Count", type: "number", num_type: "uint", default: 0},
+    secondary: {id: "secondary", label: "Secondary Weapon Count", type: "number", num_type: "uint", default: 0},
+    lances: {id: "lances", label: "Lance-like Weapon Count", type: "number", num_type: "uint", default: 0},
+    pdc: {id: "pdc", label: "PDC-like Weapon Count", type: "number", num_type: "uint", default: 0},
+    torpedoes: {id: "torpedoes", label: "Torpedo/Missile Count", type: "number", num_type: "uint", default: 0},
+    shield: {id: "shield", label: "Has a Shield", type: "bool", default: false},
+    stealth: {id: "stealth", label: "Has Stealth", type: "bool", default: false},
+    systems: {id: "systems", label: "Additional systems", type: "number", num_type: "uint", default: 0},
+    engines: {id: "engines", label: "Engines (format: '4S 2M 1L')", type: "text", default: "0"},
+    ftl: {id: "ftl", label: "FTL Type", type: "select", options: ftl_types, default: "NONE"},
+    cargo: {id: "cargo", label: "Cargo Space (1 unit per meter)", type: "number", num_type: "ufloat", default: 0},
+    drone: {id: "drone", label: "Is a drone", type: "bool", default: false},
+    other: {id: "other", label: "Other Costs", type: "number", num_type: "ufloat", default: 0},
+    boat: {id: "boat", label: "Is a boat", type: "bool", default: false}
+}
 
-const er = (values: shipRateInput): number => {
+const er = (values: ShipRateInput): number => {
     const {
         length, main, secondary, 
         lances, pdc, torpedoes, 
@@ -86,7 +81,7 @@ const er = (values: shipRateInput): number => {
     return (lCost + mCost + seCost + lanCost + pCost + tCost + sCost + sysCost + engineCost + oCost + cargoCost) * droneDiscount / 1000;
 }
 
-const cm = (values: shipRateInput): number => {
+const cm = (values: ShipRateInput): number => {
     const {
         length, main, secondary, 
         lances, pdc, torpedoes, 
@@ -117,7 +112,7 @@ const cm = (values: shipRateInput): number => {
     return (lCost + mCost + seCost + lanCost + pCost + tCost + sCost + sysCost + engineCost + cargoCost) * droneDiscount;
 }
 
-const el = (values: shipRateInput): number => {
+const el = (values: ShipRateInput): number => {
     const {
         length, main, secondary, 
         lances, pdc, torpedoes, 
@@ -148,7 +143,7 @@ const el = (values: shipRateInput): number => {
     return (lCost + mCost + seCost + lanCost + pCost + tCost + sCost + sysCost + engineCost + cargoCost) * droneDiscount;
 }
 
-const cs = (values: shipRateInput): number => {
+const cs = (values: ShipRateInput): number => {
     const {
         length, main, secondary, 
         lances, pdc,
@@ -175,26 +170,7 @@ const cs = (values: shipRateInput): number => {
     return (lCost + mCost + seCost + lanCost + pCost + sysCost + engineCost) * droneDiscount;
 }
 
-const splitCurrency = (input = "", def = "ER") => {
-    try {
-        const trim: any = input.trim();
-        const enginePattern = /(\d+)([SML])\s*/g;
-        let match;
-        const result = [];
-        
-        while ((match = enginePattern.exec(trim)) !== null) {
-            const count = parseInt(match[1], 10);
-            const engineType = match[2];
-            result.push([count, engineType]);
-        }
-        
-        return result.length > 0 ? result : [[NaN, def]];
-    } catch (e) {
-        return [[NaN, def]];
-    }
-}
-
-const rate = (values: shipRateInputPreprocessed): VehicleCost => {
+const rate = (values: ShipRateInputPreprocessed): VehicleCost => {
     const multiplier = values.boat ? 0.85 : 1;
     
     const valuesCopy = { ...values };
@@ -204,7 +180,7 @@ const rate = (values: shipRateInputPreprocessed): VehicleCost => {
     console.log(values);
 
     return {
-        er: Math.ceil(er(processed) * 1000000000 * multiplier),
+        er: Math.ceil(er(processed) * (10**9) * multiplier),
         cm: Math.ceil(cm(processed) * multiplier),
         cs: Math.ceil(cs(processed) * multiplier),
         el: Math.ceil(el(processed) * multiplier),
