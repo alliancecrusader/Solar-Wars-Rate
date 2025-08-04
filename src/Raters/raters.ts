@@ -17,5 +17,5 @@ export const raters = {
   shipRate: { rater: ship, label: "Ship Rater" },
   missileRate: { rater: missile, label: "Missile Rater" },
   infantryRate: { rater: infantry, label: "Infantry Rater" },
-  airRate: { rater: air, label: "Air Rater" },
+  airRate: { rater: air, label: "Air Rater (Experimental)" },
 };
