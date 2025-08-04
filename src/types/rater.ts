@@ -1,29 +1,29 @@
 export type VehicleCost = {
-    cs: number,
-    cm: number,
-    el: number,
-    er: number,
-    cs_upkeep: number
-}
+  cs: number;
+  cm: number;
+  el: number;
+  er: number;
+  cs_upkeep: number;
+};
 
 export type InfantryCost = {
   time: number;
   er: number;
-}
+};
 
 export type SlashCommand = {
   command: string;
   args: {
-    [key: string]: string
+    [key: string]: string;
   };
-}
+};
 
 export type ParamBase = {
   id: string;
   label: string;
 };
 
-export type NumberType = "int" | "uint" | "float" | "ufloat"
+export type NumberType = "int" | "uint" | "float" | "ufloat";
 
 export type ParamNumber = ParamBase & {
   type: "number";
@@ -31,14 +31,14 @@ export type ParamNumber = ParamBase & {
   range?: {
     max?: number;
     min?: number;
-  }
-  step?: number,
+  };
+  step?: number;
   default?: number;
 };
 
 export type ParamSelect = ParamBase & {
   type: "select";
-  options: {[key: string]: string};
+  options: { [key: string]: string };
   default?: string;
 };
 
@@ -55,8 +55,8 @@ export type ParamBool = ParamBase & {
 export type ParamType = ParamNumber | ParamSelect | ParamText | ParamBool;
 
 export type Params = {
-  [key: string]: ParamType
-}
+  [key: string]: ParamType;
+};
 
 export type ParamTypeDict = {
   number: ParamNumber;

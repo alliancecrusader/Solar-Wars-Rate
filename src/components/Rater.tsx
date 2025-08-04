@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import * as Types from "../modules/types";
+import * as Types from "../types/rater";
 import createInputElement from "./input_types/InputType";
 
 type CalculatorProps = {
@@ -9,26 +9,37 @@ type CalculatorProps = {
   goBack?: () => void;
 };
 
-const cost_message_formatter = (cost: Types.VehicleCost | Types.InfantryCost): string => {
-    if ('time' in cost) {
-        // InfantryCost
-        return `${cost.er} ER, Training time: ${cost.time} months (IRP)`;
-    } else {
-        // VehicleCost
-        return `${cost.er} ER, ${cost.cm} CM, ${cost.cs} CS, ${cost.el} EL, ${cost.cs_upkeep} CS Upkeep`;
-    }
-}
+const cost_message_formatter = (
+  cost: Types.VehicleCost | Types.InfantryCost
+): string => {
+  if ("time" in cost) {
+    // InfantryCost
+    return `${cost.er} ER, Training time: ${cost.time} months (IRP)`;
+  } else {
+    // VehicleCost
+    return `${cost.er} ER, ${cost.cm} CM, ${cost.cs} CS, ${cost.el} EL, ${cost.cs_upkeep} CS Upkeep`;
+  }
+};
 
-const Rater: React.FC<CalculatorProps> = ({ rate_name, params, computeCost, goBack }) => {
+const Rater: React.FC<CalculatorProps> = ({
+  rate_name,
+  params,
+  computeCost,
+  goBack,
+}) => {
   const [values, setValues] = useState<Record<string, any>>(
-    Object.fromEntries(Object.entries(params).map(([_, param]) => [param.id, param.default]))
+    Object.fromEntries(
+      Object.values(params).map((param) => [param.id, param.default])
+    )
   );
-  
+
   const [display, setDisplay] = useState<string>("");
 
   const handleChange = (id: string, value: any) => {
     if (!params[id]) {
-      console.log(`Error: Parameter with ID ${id.toString()} does not exist for ${rate_name}.`); 
+      console.log(
+        `Error: Parameter with ID ${id.toString()} does not exist for ${rate_name}.`
+      );
       return;
     }
 
@@ -39,12 +50,13 @@ const Rater: React.FC<CalculatorProps> = ({ rate_name, params, computeCost, goBa
     let result = undefined;
     try {
       result = computeCost(values);
-    }
-    catch (e) {
-      setDisplay(`Error: ${e}.`)
+    } catch (e) {
+      setDisplay(`Error: ${e}.`);
     }
 
-    setDisplay(cost_message_formatter(result as Types.InfantryCost | Types.VehicleCost));
+    setDisplay(
+      cost_message_formatter(result as Types.InfantryCost | Types.VehicleCost)
+    );
   };
 
   console.log("Current values:", values);
@@ -58,18 +70,16 @@ const Rater: React.FC<CalculatorProps> = ({ rate_name, params, computeCost, goBa
           {createInputElement({
             handleChange: handleChange,
             values: values,
-            param: param
+            param: param,
           })}
         </div>
       ))}
       <button onClick={handleSubmit}>Calculate</button>
-      {(
-        <div className="result">
-            {display}
-        </div>
-      )}
+      {<div className="result">{display}</div>}
       {goBack && (
-        <button onClick={goBack} className="menu-button">Back to Menu</button>
+        <button onClick={goBack} className="menu-button">
+          Back to Menu
+        </button>
       )}
     </div>
   );

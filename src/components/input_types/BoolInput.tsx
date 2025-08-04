@@ -1,22 +1,22 @@
-import { InputBuilder } from "../../modules/types";
+import { InputBuilder } from "../../types/rater";
 
 const parseBool = (value: string): boolean => {
-    if (value.toLowerCase() === "true") return true;
-    if (value.toLowerCase() === "false") return false;
-    return false;
+  if (value.toLowerCase() === "true") return true;
+  if (value.toLowerCase() === "false") return false;
+  return false;
 };
 
-const BoolInput = ({handleChange, values, param}: InputBuilder<'bool'>) => {
-    return (
+const BoolInput = ({ handleChange, values, param }: InputBuilder<"bool">) => {
+  return (
     <select
-        id={param.id}
-        value={values[param.id]}
-        onChange={(e) => handleChange(param.id, parseBool(e.target.value))}
+      id={param.id}
+      value={values[param.id]}
+      onChange={(e) => handleChange(param.id, parseBool(e.target.value))}
     >
-        <option value="true">True</option>
-        <option value="false">False</option>
+      <option value="true">True</option>
+      <option value="false">False</option>
     </select>
-    );
-}
+  );
+};
 
 export default BoolInput;
